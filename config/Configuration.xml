@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Steps>
+    <step id="1" name="Download archive files from FTP" countries="DA" versions="current,latest,previous">
+      <script>C:\projects\execute_deploy\scripts\test.ps1 --PasswordFtp --country</script>
+      <scope>help/Capture.PNG</scope>
+    </step>
+    <step id="2" name="Unzip files" countries="DA,RO" versions="current">
+      <script>C:\projects\execute_deploy\scripts\test.ps1 --PasswordTest --version</script>
+      <scope />
+    </step>
+    <step id="0" name="Update V.1 dictionaries" countries="RO" versions="latest">
+      <script>[WARNING] - Dictionaries are updated?</script>
+      <scope></scope>
+    </step>
+    <step id="3" name="Copy Database Folder" countries="PL" versions="current,latest,previous">
+      <script>C:\projects\execute_deploy\scripts\test.ps1 --PasswordDb --country --version</script>
+      <scope>Details File.txt</scope>
+    </step>
+    <step id="4" name="Prepare DBGhost XML config files" countries="RO" versions="current,latest,previous">
+      <script>PSScrioe3.ps1</script>
+      <scope>Details File.txt</scope>
+    </step>
+    <step id="5" name="Run Replacer to Update Synonyms" countries="PL" versions="current,latest,previous">
+      <script>PSScrioe3.ps1</script>
+      <scope>Details File.txt</scope>
+    </step>
+    <step id="6" name="Update SQL files" countries="DA,HU" versions="V.1">
+      <script>PSScrioe3.ps1</script>
+      <scope>Details File.txt</scope>
+    </step>
+    <step id="7" name="Delete SQL file uspCIS_Import6RClients" countries="RO" versions="current,latest,previous">
+      <script>PSScrioe3.ps1</script>
+      <scope>Delete SQL file uspCIS_Import6RClients.txt</scope>
+    </step>
+    <step id="8" name="Run BGHost on CIS_Archive" countries="RO" versions="current,latest,previous">
+      <script>PSScrioe3.ps1</script>
+      <scope>Details File.txt</scope>
+    </step>
+    <step id="9" name="Run DBGhost on CIS" countries="RO" versions="current,latest,previous,V.1">
+      <script>PSScrioe3.ps1</script>
+      <scope>Details File.txt</scope>
+    </step>
+    <step id="10" name="Run Refresh for V.1" countries="RO" versions="current,latest,previous">
+      <script>PSScrioe3.ps1</script>
+      <scope>Run Refresh for V.1.txt</scope>
+    </step>
+  </Steps>
+</Configuration>

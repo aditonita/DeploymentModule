@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <style>
+  table
+  {
+    background-color: #dddddd;
+  }
+  summary:hover{
+    color: red;
+    cursor: -webkit-grab;
+    cursor: grab;
+  }
+  #code_box{
+    background-color: #404040;
+    width: 50%;
+    //border: 15px solid green;
+    padding: 10px;
+    //margin: 20px;
+    color: white;
+  }
+  </style>
+  </head>
+  <body>
+  
+  <h1>CIS Installation Process</h1>
+
+  <h2>Table of content</h2>
+    <ul>
+    <li><a href="#section1">Accepted tasks</a></li>
+    <li><a href="#section2">Accepted servers to run tasks</a></li>
+    <li><a href="#section3">Update dictionaries</a></li>
+    <li><a href="#section4">Download Archive Files from FTP</a></li>
+    <li><a href="#section5">Unzip Files</a></li>
+    <li><a href="#section6">Copy Database Folder</a></li>
+    <li><a href="#section7">Prepare DBGhost Xml Configuration Files</a></li>
+    <li><a href="#section8">Run Replacer to update Synonims</a></li>
+    <li><a href="#section9">Update Sql Files</a></li>
+    <li><a href="#section10">Delete Sql Files upsCIS_Import6RClients</a></li>
+    <li><a href="#section11">Run DBGHost on CIS_Archive</a></li>
+    <li><a href="#section12">Disable CDC</a></li>
+    <li><a href="#section13">Run DBGHost on CIS</a></li>
+    <li><a href="#section14">Enable CDC</a></li>
+    <li><a href="#section15">Run Book Appointent Triggers</a></li>
+    <li><a href="#section16">Stop Servers</a></li>
+    <li><a href="#section17">Stop AppPools</a></li>
+    <li><a href="#section18">Run Refresh IIS</a></li>
+    <li><a href="#section19">Copy Web.config file for MOB</a></li>
+    <li><a href="#section20">Copy AX dll</a></li>
+    <li><a href="#section21">Run Find and Replace (FAR) application</a></li>
+    <li><a href="#section22">Start Servers</a></li>
+    <li><a href="#section23">Start AppPools</a></li>
+    </ul>
+  <h2 id="section1">Accepted tasks</h2>
+    <ul>
+      <li>Warning task:
+        <ul>
+          <li>Script section starts with "[WARNING]" word</li>
+          <li>It lunch an "Warning" window</li>
+          <li>Press "Yes" to continue or "No" button to exit from application</li>
+        </ul>
+      <li>Powershell task:</li>
+        <ul>
+          <li>Script section contains powershel script with relative/absolute path and argumens</li>
+          <li>Arguments accepted: --country, --version and all arguments from app.config file. The values are from dropdown list or app.config file.</li>
+        </ul>
+    </ul>
+  <div>
+    <p><img src="./images/accepted-tasks.jpg" alt="accepted-tasks"></p>
+  </div>
+  <h2  id="section2">Accepted servers to run tasks</h2>
+    <ul>
+      <li>Test environment [medtechtest2/10.0.2.76]
+        <ul>
+          <li>All tasks except <i>Delete Sql Files upsCIS_Import6RClient</i></li>
+        </ul>
+      </li>
+      <li>SuperStaging environment DBGhost [waw60ssdbs02.mednet.world/10.6.1.200]
+        <ul>
+          <li>All DBGhost tasks except refresh IIS tasks: <i>Stop Servers, Run Refresh IIS, Copy Web.config file for MOB, Copy AX dll, FAR, Start Servers</i></li>
+        </ul>      
+      </li>
+	  <li>SuperStaging environment IIS [waw60ssapp02.mednet.world/10.6.1.199, mcropdc01-app02.mednet.world/10.6.7.234]
+	    <ul>
+		  <li>PL, DA, HU Desktop and IIS applications [waw60ssapp02.mednet.world/10.6.1.199]</li>
+		  <li>RO Desktop and IIS applications [mcropdc01-app02.mednet.world/10.6.7.234]</li>
+		  <li>All tasks except DBGhost tasks: <i>Prepare DBGhost Xml Configuration Files, Run Replacer to update Synonims, Update Sql Files, Delete Sql Files upsCIS_Import6RClients, Run DBGHost on CIS_Archive, Disable CDC, Run DBGHost on CIS, Enable CDC, Run Book Appointent Triggers</i></li>
+		</ul>
+	  </li>
+    </ul>
+
+  <div>
+    <p><img src="./images/accepted-servers.jpg" alt="accepted-servers"></p>
+  </div>  
+  <h2 id="section3">Update dictionaries</h2>
+  <p><b>Scope: [Warning] - Verify if Dictionaries are updated</b></p>
+  <p><b>Servers: TEST [medtechtest2/10.0.2.76], SS PL [waw60ssapp02.mednet.world/10.6.1.199], SS RO [mcropdc01-app02.mednet.world/10.6.7.234]</b></p>
+  <p>The deployment/refresh should use the latest version of dictionaries. The task shows a message box to confirm. If you press the <b>"No"</b> button the application is closed.</p>
+  <p>The task could be unchecked if the dictionaries are up to date.</p>
+  <div>
+    <img src="./images/build.jpg" alt="MessageBox Yes/No">
+  </div>
+  <br>
+  <details>
+  <summary><i><u>How To Check Last Installed Version Dictionary</u></i></summary>.
+  <p>To check the latest dictionaries go to Azure DevOps, select <b>Medicover Tech DevOps</b> repository from <b>Medicover TechDevOps</b> project. It could be necessary to select <b>dictionaries</b> branch. The file <b>Dictionaries/history/dicitonaryChanges</b> contains the history changes.</p>
+  <div>
+    <p>Select <b>History</b> tab to see <i>the last date change</i>. Compare changes between your verison and another version keeping the time stamp releases.</p>
+    <p>The oldest dictionary is <b>Previous</b>. This dicitonary exists only on <b>Test environment</b>. The <b>V.1</b> dictionary is updated before each country release and it is used when we deploy <i>V.1-HU/V.2-RO/V.3-DA/V.4-PL</i> versions. The <b>Current</b> dictionary is used to deploy <i>Current</i> version located in Production branch. The <b>Latest</b> dictionary is the dictionary coresponding to develop branch used to deploy the <i>Latest</i> version and it is the newest dicitonary.</p>
+    <p>Download the file <a href="C:\docs\How to update dictionaries.docx" download>How to update dictionaries</a> for more information.</p>
+    <img src="./images/build.jpg" alt="Medicover TechDevOps History">
+  </div>
+  <div>
+    <a href="https://dev.azure.com/MedicoverTech/_git/Medicover%20Tech%20DevOps">https://dev.azure.com/MedicoverTech/_git/Medicover%20Tech%20DevOps</a>
+    <br><br>
+    <img src="./images/build.jpg" alt="Medicover TechDevOps">
+  </div>
+  </details>
+  <h2 id="section4">Download Archive Files from FTP</h2>
+  <p><b>Scope: [Run Powershell script] - Get all necessary files from FTP for deployment/refresh</b></p>
+  <p><b>Servers: TEST [medtechtest2/10.0.2.76], SS PL [waw60ssapp02.mednet.world/10.6.1.199], SS RO [mcropdc01-app02.mednet.world/10.6.7.234], SS DBGhost [waw60ssdbs02.mednet.world/10.6.1.200]</b></p>
+  <p>It runs PSscript <b>ftp-download.ps1</b> to download from FTP the files exisiting in file: <b>ftp-files-to-download</b>. Write a file per each line if you need to download more than one file.</p>
+  <p><i>If is necessary run pipeline to build artifacts, create 7z archive and upload in FTP folder</i>. 
+    Download file <a href="C:\docs\How to run AzureDevops pipeline.docx" download>How to build artifacts</a>.
+  </p>
+  <p>FTP password is parsed as argument</p>
+  <div id="code_box">&lt;script&gt;..\scripts\ftp-download.ps1 --password&lt;/script&gt;</div>
+  <div>
+    <p><img src="./images/build.jpg" alt="ftp-files-to-download"></p>
+  </div>
+  <h2 id="section5">Unzip Files</h2>
+  <p><b>Scope: [Run Powershell script] - Uncompress all files downloaded from FTP</b></p>
+  <p><b>Servers: TEST [medtechtest2/10.0.2.76], SS PL [waw60ssapp02.mednet.world/10.6.1.199], SS RO [mcropdc01-app02.mednet.world/10.6.7.234], SS DBGhost [waw60ssdbs02.mednet.world/10.6.1.200]</b></p>
+  <div>
+    <p><img src="./images/unarchive.jpg" alt="unzip-files"></p>
+  </div>
+  <h2 id="section6">Copy Database Folder</h2>
+  <p><b>Scope: [Run Powershell script] - Copy database folders necessary to run DBGhost</b></p>
+  <p><b>Servers: TEST [medtechtest2/10.0.2.76], SS DBGhost [waw60ssdbs02.mednet.world/10.6.1.200]</b></p>
+  <div>
+    It copies folders "CIS" and "CISArchive" under DB directory into \\IP_SERVER\DB_VERSION directory, where IP_SERVER could be: IP_Server_Test (10.0.2.76), IP_Server_SS_DB (10.6.1.200) and DB_VERSION is: DB_Current, DB_Latest, DB_Previous, DB_V_1
+    <div id="code_box">&lt;script&gt;..\scripts\copy-database-folder.ps1&lt;/script&gt;</div>
+  </div>
+  <div>
+    <p><img src="./images/copy_db.jpg" alt="copy-db-folders"></p>
+  </div>
+  <h2 id="section7">Prepare DBGhost Xml Configuration Files</h2>
+  <p><b>Scope: [Run Powershell script] - Create Xml Configuration files for V.1</b></p>
+  <p><b>Servers: TEST [medtechtest2/10.0.2.76], SS DBGhost [waw60ssdbs02.mednet.world/10.6.1.200]</b></p>
+  <div><i>This task need to be run only for V.1 version.</i>It creates Xml configuration file for selected country and V.1 version into DB_V_1 directory. For current,latest and previous version should be unchecked.</div>
+  <p>Country is parsed as argument</p>
+  <div id="code_box">&lt;script&gt;..\scripts\update-xml-dbghost-config.ps1 --country&lt;/script&gt;</div>
+  <div>
+  <div>
+    <p><img src="./images/copy_xml_db_config.jpg" alt="copy-xml-db-config"></p>
+  </div>
+  <h2 id="section8">Run Replacer to update Synonyms</h2>
+  <p><b>Scope: [Run Powershell script] - Modify Create Synonyms Sql files from CIS</b></p>
+  <p><b>Servers: TEST [medtechtest2/10.0.2.76], SS DBGhost [waw60ssdbs02.mednet.world/10.6.1.200]</b></p>
+  <div>
+    <i>This task need to be run only for V.1 version.</i>It modify sql files for selected country and V.1 version into DB_V_1\CIS\Synonyms directory. Synonyms should be created in CISArchive database. For current,latest and previous version should be unchecked.
+    <div id="code_box">&lt;script&gt;..\scripts\run-replacer-toupdate-synonyms.ps1&lt;/script&gt;</div>
+  </div>
+  <div>
+    <p><img src="./images/modify_synonyms.jpg" alt="modify-synonyms"></p>
+  </div>
+  <h2 id="section9">Update Sql Files</h2>
+  <p><b>Scope: [Run Powershell script] - Modify URI's in Advanced Script Sql files from CIS</b></p>
+  <p><b>Servers: TEST [medtechtest2/10.0.2.76], SS DBGhost [waw60ssdbs02.mednet.world/10.6.1.200]</b></p>
+  <div><i>This task need to be run only for V.1 version.</i>It modify sql files (_after_DONT_DELETE_LEAVE_IT_LAST_update_ApplicationLogConfig_for_MedDev.sql, _after_DONT_DELETE_LEAVE_IT_LAST_update_ReportsSites_for_MedDev.sql) for V.1 version into DB_V_1\CIS\Advanced Scripts\_RunnableForAllReleases directory. For current,latest and previous version should be unchecked.</div>
+  <div>
+    <p><img src="./images/modify_uri.jpg" alt="modify-uri"></p>
+  </div>
+  <h2 id="section10">Delete Sql Files uspCIS_Import6RClients</h2>
+  <p><b>Scope: [Run Powershell script] - remove Sql file dbo.uspCIS_Import6RClients.sql</b></p>
+  <p><b>Servers: SS DBGhost [waw60ssdbs02.mednet.world/10.6.1.200]</b></p>
+  <div><i>This task need to be run only for V.1 version in SS environment. </i>It remove sql file dbo.uspCIS_Import6RClients.sql for V.1 version into DB_V_1\CIS\Stored Procedures\PL directory. For current,latest and previous version should be unchecked.</div>
+  <div>
+    <p><img src="./images/remove-sql.jpg" alt="remove-sql"></p>
+  </div>
+  <h2 id="section11">Run DBGHost on CIS_Archive</h2>
+  <p><b>Scope: [DBGhost Change Manager application] - lunch DBGhost application in UI mode</b></p>
+  <p><b>Servers: TEST [medtechtest2/10.0.2.76], SS DBGhost [waw60ssdbs02.mednet.world/10.6.1.200]</b></p>
+  <div>It open DBGhost Change Manager and run for CISArchive directory.</div>
+  <div>
+    <p><img src="./images/dbghost-cis-archive.jpg" alt="dbghost-cis-archive"></p>
+  </div>
+  <h2 id="section12">Disable CDC</h2>
+  <p><b>Scope: [Run Powershell script] - run sql script to disable cahnge data capture</b></p>
+  <p><b>Servers: TEST [medtechtest2/10.0.2.76], SS DBGhost [waw60ssdbs02.mednet.world/10.6.1.200]</b></p>
+  <div>Execute stored procedure <i>sys.sp_cdc_disable_db <b>only for PL country</b></i>.</div>
+  <div>
+    <p><img src="./images/disable-cdc.jpg" alt="disable-cdc"></p>
+  </div>
+  <h2 id="section13">Run DBGHost on CIS</h2>
+  <p><b>Scope: [DBGhost Change Manager application] - lunch DBGhost application in UI mode</b></p>
+  <p><b>Servers: TEST [medtechtest2/10.0.2.76], SS DBGhost [waw60ssdbs02.mednet.world/10.6.1.200]</b></p>
+  <div>It opens DBGhost Change Manager and run scripts under CIS directory. <i>For V.1 version you have to select all SQL files related to country and previous version in section <b>"Select Target Database Post-Process Custom Scripts"</b> to be sure all Prod scripts are in place</i>.</div>
+  <div>
+    <p><img src="./images/dbghost-cis.jpg" alt="dbghost-cis"></p>
+  </div>
+  <h2 id="section14">Enable CDC</h2>
+  <p><b>Scope: [Run Powershell script] - run sql script to enable cahnge data capture</b></p>
+  <p><b>Servers: TEST [medtechtest2/10.0.2.76], SS DBGhost [waw60ssdbs02.mednet.world/10.6.1.200]</b></p>
+  <div>Execute stored procedure <i>sys.sp_cdc_enable_db <b>only for PL country</b></i>.</div>
+  <div>
+    <p><img src="./images/enable-cdc.jpg" alt="enable-cdc"></p>
+  </div>
+  <h2 id="section15">Run Book Appointent Triggers</h2>
+  <p><b>Scope: [Run Powershell script] - run sql script uspDpl_BookAppointmentTriggers</b></p>
+  <p><b>Servers: TEST [medtechtest2/10.0.2.76], SS DBGhost [waw60ssdbs02.mednet.world/10.6.1.200]</b></p>
+  <div>Execute Sql script <i>dbo.uspDpl_BookAppointmentTriggers.sql</i> under <i>../CIS/Stored Procedures</i> directory <b>only for DA and PL countries</b>.</div>
+  <div>
+    <p><img src="./images/book-appointment-triggers.jpg" alt="book-appointment-triggers"></p>
+  </div>
+  <h2 id="section16">Stop Servers</h2>
+  <p><b>Scope: [Run Powershell script] - Stop applications processes</b></p>
+  <p><b>Servers: TEST [medtechtest2/10.0.2.76], SS PL [waw60ssapp02.mednet.world/10.6.1.199], SS RO [mcropdc01-app02.mednet.world/10.6.7.234]</b></p>
+  <div>It stops processes for country and version selected. Process examples: TestServer_${country}_${version}, TestSSO, SimWinService, JobServiceConfigurator</div>
+  <div>
+    <p><img src="./images/stop-servers.jpg" alt="stop-servers"></p>
+  </div>
+  <h2 id="section17">Stop AppPools</h2>
+  <p><b>Scope: [Run Powershell script] - Stop IIS App Pools</b></p>
+  <p><b>Servers: TEST [medtechtest2/10.0.2.76], SS PL [waw60ssapp02.mednet.world/10.6.1.199], SS RO [mcropdc01-app02.mednet.world/10.6.7.234]</b></p>
+  <div>It stops IIS Application Pools for country and version selected. App Pools examples: 
+	   <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ASP_test_${version}, HomelocationAPI_${country}_test.${version},
+                                                           Latest, Current, Classic_ss_${version}_classic, KafkaService_${country}_${version}, 
+	   <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Latest_DA,  Latest_HU, Current_DA, Current_HU,  
+                                                           ASP_ss_${version}, MOB_RO_Latest, MOB_RO_Current, 
+  <div>
+    <p><img src="./images/stop-apppools.jpg" alt="stop-apppools"></p>
+  </div>
+  <h2 id="section18">Run Refresh IIS</h2>
+  <p><b>Scope: [Run Powershell script] - Install all IIS applications</b></p>
+  <p><b>Servers: TEST [medtechtest2/10.0.2.76], SS PL [waw60ssapp02.mednet.world/10.6.1.199], SS RO [mcropdc01-app02.mednet.world/10.6.7.234]</b></p>
+  <div>It installs all IIS applications under CIS directory for country and version selected</div>
+  <div>
+    <p><img src="./images/refresh-iis.jpg" alt="refresh-iis"></p>
+  </div>
+  <h2 id="section19">Copy Web.config file for MOB</h2>
+  <p><b>Scope: [Run Powershell script] - Create web.config files for HTTP and HTTPS protocols in MOB Web application</b></p>
+  <p><b>Servers: TEST [medtechtest2/10.0.2.76], SS PL [waw60ssapp02.mednet.world/10.6.1.199], SS RO [mcropdc01-app02.mednet.world/10.6.7.234]</b></p>
+  <div>Select MOB IIS Application. Applicable only for country and version selected.<br>
+    Copy web.config file from MOB.WebServices\HTTPConfig and MOB.WebServices\HTTPSConfig directories into MOB.WebService folder.</div>
+  <div>
+    <p><img src="./images/copy-mob.jpg" alt="copy-mob"></p>
+  </div>
+  <h2 id="section20">Copy AX dll</h2>
+  <p><b>Scope: [Run Powershell script] - Copy file CIS.AXServiceContracts.dll under CISJobService\Release and Server directories only for PL country</b></p>
+  <p><b>Servers: SS PL [waw60ssapp02.mednet.world/10.6.1.199]</b></p>
+  <div>Applicable only for PL country and version selected.<br>
+    Copy C:\Refresh\Refresh_["Latest"|"Current"]\AX_SS\CIS.AXServiceContracts.dll file into \\[10.0.2.76|10.6.1.199|10.6.7.234]\[test|ss].[latest|current]\["DA"|"HU"|"PL"|"RO"]\["CISJobService\Release"|"Server"] folders.</div>
+  <div>
+    <p><img src="./images/copy-ax-dll.jpg" alt="copy--ax-dll"></p>
+  </div>
+  <h2 id="section21">Run Find and Replace (FAR) application</h2>
+  <p><b>Scope: [Run Powershell script] - Open Find and Replace application</b></p>
+  <p><b>Servers: TEST [medtechtest2/10.0.2.76], SS PL [waw60ssapp02.mednet.world/10.6.1.199], SS RO [mcropdc01-app02.mednet.world/10.6.7.234]</b></p>
+  <div>Applicable only for V.1 version. It will replace files in scope of patches.</div>
+  <div>
+    <p><img src="./images/far.jpg" alt="far"></p>
+  </div>
+  <h2 id="section22">Start Servers</h2>
+  <p><b>Scope: [Run Powershell script] - Start server application.</b></p>
+  <p><b>Servers: TEST [medtechtest2/10.0.2.76], SS PL [waw60ssapp02.mednet.world/10.6.1.199], SS RO [mcropdc01-app02.mednet.world/10.6.7.234]</b></p>
+  <div>It will start Test server application for each country and version.</div>
+  <div>
+    <p><img src="./images/start-server.jpg" alt="start-server"></p>
+  </div>
+  <h2 id="section23">Start AppPools</h2>    
+  <p><b>Scope: [Run Powershell script] - Start AppPools.</b></p>
+  <p><b>Servers: TEST [medtechtest2/10.0.2.76], SS PL [waw60ssapp02.mednet.world/10.6.1.199], SS RO [mcropdc01-app02.mednet.world/10.6.7.234]</b></p>
+  <div>It will start AppPools for each country and version.</div>
+  <div>
+    <p><img src="./images/start-apppools.jpg" alt="start-apppools"></p>
+  </div>
+  </body>
+</html>
